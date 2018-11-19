@@ -1,0 +1,184 @@
+echo "# paper" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git remote add origin https://github.com/Aolong-song/paper.git
+git push -u origin master
+
+#include<stdio.h>
+#include<stdlib.h>
+
+//试设计二叉排序树的查找算法、插入算法和删除算法
+
+typedef struct BiTnode
+{
+	int key ;  //关键字域
+	struct BiTnode *Lchild;  //左指针域
+	struct BiTnode *Rchild;  //右指针域
+} BiTnode, *BiTree;
+
+/**在二叉顺序表Y中查找元素A*/
+BiTree Search_Tree(BiTree Y, int A)
+{
+	if (Y)
+	{
+		if (Y->key)
+		{
+			if (A > Y->key)	return Search_Tree(Y->Rchild, A);
+			else if (A < Y->key) return Search_Tree(Y->Lchild, A);
+			else
+			{
+				printf("查找成功！\n");
+				return Y;
+			}
+		}
+	}
+	else return NULL;
+}
+
+/**在二叉顺序表T中插入元素A*/
+int Insert_Tree(BiTree T, int A)
+{
+	BiTree i = (BiTree)malloc(sizeof(BiTnode)),
+		j = (BiTree)malloc(sizeof(BiTree));
+	if (!i)	return 0;
+	i->key = A;
+	j->key = 0;
+	i->Lchild = i->Rchild = j;
+
+	//空树直接插入
+	if (T->key==0)
+	{
+		T = i;
+		return 1;
+	}
+
+	else
+	{
+		if (T->key > A)	Insert_Tree(T->Lchild, A);
+		else if (T->key < A) Insert_Tree(T->Rchild, A);
+	}
+	return 0;
+}
+
+/**以A为起始创建二叉顺序表T*/
+BiTree Creat_Tree(BiTree *T,int *A)
+{
+	A++;
+	for (; *A != 0; A++)
+		Insert_Tree(*T, *A);
+	return *T;
+}
+/**查找T最小元素*/
+int Min_Tree(BiTree T)
+{
+	int a;
+	if (T->Lchild&&T->Lchild->Lchild)
+		Min_Tree(T->Lchild);
+	else if (T->Lchild&&T->Lchild->Lchild == NULL && T->Lchild->Rchild)
+	{
+		a = T->Lchild->key;
+		T->Lchild = T->Lchild->Rchild;
+	}
+	else if (T->Lchild&&T->Lchild->Lchild == NULL && T->Lchild->Rchild == NULL)
+	{
+		a = T->Lchild->key;
+		T->Lchild = NULL;
+	}
+	return a;
+}
+
+/**在二叉顺序表T中删除元素A*/
+int Delete_Tree(BiTree *T, int A)
+{
+	BiTree i = *T, p = NULL, s = NULL;
+	if (!i)	return 0;
+	
+	if (i->key == A)
+	{
+		//叶子结点
+		if (!i->Lchild && !i->Rchild)
+			*T = NULL;
+		//带有左节点
+		else if (!i->Rchild&&i->Lchild)
+			*T = i->Lchild;
+		//。。右。。
+		else if (!i->Lchild&&i->Rchild)
+			*T = i->Rchild;
+		//左右结点都有
+		else
+		{
+			s = i->Rchild;
+			//右支无左节点
+			if (!s->Lchild)
+				s->Lchild = i->Lchild;
+			//右支中含有左节点
+			else
+			{
+				while (s->Lchild)
+				{
+					p = s;
+					s = s->Lchild;
+				}
+				p->Lchild = s->Rchild;
+				s->Lchild = p->Lchild;
+				s->Rchild = p->Rchild;
+			}
+			*T = s;
+		}
+		free(p);
+	}
+	else if (A > p->key)
+		Delete_Tree(&(p->Rchild), A);
+	else if (A < p->key)
+		Delete_Tree(&(p->Lchild), A);
+	printf("删除成功！\n");
+	return 1;
+}
+
+/**主函数调用查找，插入，删除*/
+int main()
+{
+	BiTree P,i;
+	P = (BiTree)malloc(sizeof(BiTree));
+	i = (BiTree)malloc(sizeof(BiTree));
+	i->key = 0;
+	int x, a[20] = {0};
+	while (1)
+	{
+		printf("1,创建二叉排序树\t2,查找元素\t3,插入元素\t4,删除元素\t5,结束\n");
+		scanf("%d", &x);
+		switch (x)
+		{
+		case 1:
+			printf("请输入二叉树元素,并以零结束:");
+			scanf("%d", &a[0]);
+			for (x = 1; a[x-1] != 0; x++)
+				scanf("%d", &a[x]);
+			P->key = a[0];
+			P->Lchild = P->Rchild = i;
+			for (x=1; a[x] != 0; x++)
+				Insert_Tree(P, a[x]);
+			printf("创建成功！\n");
+			break;
+		case 2:
+			printf("请输入要查找的元素:");
+			scanf("%d", &x);
+			Search_Tree(P, x);
+			break;
+		case 3:
+			printf("请输入要插入的元素:");
+			scanf("%d", &x);
+			Insert_Tree(P, x);
+			printf("插入成功！");
+			break;
+		case 4:
+			printf("请输入要删除的元素:");
+			scanf("%d", &x);
+			Delete_Tree(&P, x);
+			break;
+		case 5:
+			return 1;
+		}
+	}
+}
