@@ -1,9 +1,4 @@
-echo "# paper" >> README.md
-git init
-git add README.md
-git commit -m "first commit"
-git remote add origin https://github.com/Aolong-song/paper.git
-git push -u origin master
+
 
 #include<stdio.h>
 #include<stdlib.h>
